@@ -1,0 +1,21 @@
+
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/" xmlns:biz="http://schemas.datacontract.org/2004/07/Bizzio.Srv.Extensions.RiznShop" 
+                         xmlns:arr="http://schemas.microsoft.com/2003/10/Serialization/Arrays">
+                <soapenv:Header>
+                <tem:Authentication xmlns:tem="http://tempuri.org/">
+                    <biz:Database xmlns:biz="http://schemas.datacontract.org/2004/07/Bizzio.Srv.Extensions.RiznShop">InCloud</biz:Database>
+                    <biz:Username xmlns:biz="http://schemas.datacontract.org/2004/07/Bizzio.Srv.Extensions.RiznShop">InCloud</biz:Username>
+                   <biz:Password xmlns:biz="http://schemas.datacontract.org/2004/07/Bizzio.Srv.Extensions.RiznShop">1ncl0ud</biz:Password>
+                </tem:Authentication>
+            </soapenv:Header>
+            <soapenv:Body>
+                <tem:GetArticlesRequest>
+                    <tem:AvailableOnly>false</tem:AvailableOnly>
+                     
+                    
+                    <tem:ID_Site>291608419469623297</tem:ID_Site>
+                    <tem:IsFiles>true</tem:IsFiles>
+                </tem:GetArticlesRequest>
+            </soapenv:Body>
+        </soapenv:Envelope>
+        

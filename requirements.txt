@@ -1,0 +1,7 @@
+requests==2.31.0          # За HTTP заявки към WooCommerce и Bizzio API
+xmltodict==0.13.0         # По-лесно парсиране на XML в Python речници
+lxml==4.9.3               # Бързо и ефективно XML парсиране
+zeep==4.2.1               # SOAP клиент за работа с Bizzio API
+pillow==10.0.0            # Обработка на изображения за качване в WooCommerce
+schedule==1.2.1           # Автоматизация на периодични задачи (cron jobs)
+python-dotenv==1.0.0      # Зареждане на API ключове и конфигурации от .env файл

@@ -25,7 +25,7 @@ class BizzioAPI:
                     <tem:AvailableOnly>false</tem:AvailableOnly>
                      
                     {f'<tem:ModifiedAfter>{modified_after}</tem:ModifiedAfter>' if modified_after else ''}
-                    <tem:ID_Site>291608419469623297</tem:ID_Site>
+                    <tem:ID_Site>{self.auth["SITE_ID"]}</tem:ID_Site>
                     <tem:IsFiles>true</tem:IsFiles>
                 </tem:GetArticlesRequest>
             </soapenv:Body>

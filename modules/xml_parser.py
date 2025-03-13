@@ -10,7 +10,7 @@ class BizzioXMLParser:
             self.root = ET.fromstring(xml_source)
 
     def get_products(self, batch_size=100):
-        """Извлича продукти на партиди (batch)"""
+        """Извлича продукти и обработва изображения, файлове и атрибути"""
         namespace = "{http://schemas.datacontract.org/2004/07/Bizzio.Srv.Extensions.RiznShop}"
         products = []
         count = 0
@@ -21,27 +21,15 @@ class BizzioXMLParser:
                 "name": article.find(f"{namespace}Name").text if article.find(f"{namespace}Name") is not None else None,
                 "price": float(article.find(f"{namespace}P_Sale").text) if article.find(f"{namespace}P_Sale") is not None else None,
                 "qty": int(article.find(f"{namespace}Qty").text) if article.find(f"{namespace}Qty") is not None else 0,
-                "meta_data": [  # Мета данни
+                "props": [prop.text for prop in article.findall(f"{namespace}Props/*") if prop.text],  # Записва всички `b:string`
+                "files": [
                     {
-                        "key": "SKU",
-                        "value": article.find(f"{namespace}Barcode").text
-                    } ,
-                    {
-                        "key": "ID_SiteArticle",
-                        "value": article.find(f"{namespace}SiteArticles/{namespace}SA/{namespace}ID_SiteArticle").text
+                        "id": file.find(f"{namespace}ID").text if file.find(f"{namespace}ID") is not None else None,
+                        "name": file.find(f"{namespace}Name").text if file.find(f"{namespace}Name") is not None else None,
+                        "url": file.find(f"{namespace}Uri").text if file.find(f"{namespace}Uri") is not None else None,
                     }
+                    for file in article.findall(f"{namespace}Files/{namespace}FI")
                 ],
-                """ Images or files is attached in  Files->FI->Uri """
-                "images": 
-                         [
-                             {
-                                "id": 42
-                            },
-                            {
-                                "src": "https://bizzio.gencloud.bg/a/MzZ8KGkkWEcQTzUycgoQQWEJBHYbfgMARHJmAHUH.jpg"
-                            } 
-                         ]
-                
             }
             products.append(product_data)
             count += 1

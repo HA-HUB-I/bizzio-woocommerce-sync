@@ -41,6 +41,25 @@ def sync_products_batch():
         update_list = []
         delete_list = []  # Можем да добавим логика за изтриване, ако е нужно
 
+       # Извличане на всички съществуващи продукти по SKU наведнъж
+        existing_products = woo_api.get_products_by_skus([p["barcode"] for p in batch])   
+
+        # # Разделяне на изображения и файлове
+        # images = [file["url"] for file in product["files"] if file["url"].endswith((".png", ".jpg", ".jpeg"))]
+        # files = [file for file in product["files"] if not file["url"].endswith((".png", ".jpg", ".jpeg"))]
+
+        # # Обработка на изображенията (първото става основно)
+        # product_images = [{"src": images[0]}] if images else []
+        # if len(images) > 1:
+        #     product_images += [{"src": img} for img in images[1:]]
+
+         # Добавяне на мета полета за`
+        meta_data = []    
+
+        # # Добавяне на файлове като мета линкове
+        # for file in files:
+        #     meta_data.append({"key": f"file_{file['name']}", "value": file["url"]})         
+
         for product in batch:
             product_data = {
                 "name": product["name"],
@@ -49,17 +68,18 @@ def sync_products_batch():
                 "stock_quantity": product["qty"],
                 "categories": [{"id": 5}],  # Променете ID ако е нужно
                 "meta_data": [{"key": f"prop_{i}", "value": v} for i, v in enumerate(product["props"])],
+                "meta_data": meta_data
             }
 
-            # Проверяваме дали продуктът съществува
-            existing_product = woo_api.get_product_by_sku(product["barcode"])
+            # Проверяваме дали SKU вече съществува в WooCommerce
+            existing_product = existing_products.get(product["barcode"])
             if existing_product:
-                product_data["id"] = existing_product["id"]
+                product_data["id"] = existing_product["id"]  # Добавяме ID за актуализация
                 update_list.append(product_data)
             else:
                 create_list.append(product_data)
 
         # Изпращаме batch заявка
-        woo_api.batch_process_products(create_products=create_list, update_products=update_list, delete_products=delete_list)
+        woo_api.batch_process_products(create_products=create_list, update_products=update_list)
 
     print("✅ Синхронизация с WooCommerce завърши успешно!")

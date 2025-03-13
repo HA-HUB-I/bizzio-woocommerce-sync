@@ -9,34 +9,46 @@ class BizzioXMLParser:
         else:
             self.root = ET.fromstring(xml_source)
 
+    def safe_get_text(self, element):
+        """Безопасно извличане на текст от XML елемент, избягвайки грешки"""
+        return element.text.strip() if element is not None and element.text else ""
+
     def get_products(self, batch_size=100):
-        """Извлича продукти и обработва изображения, файлове и атрибути"""
+        """Извлича продукти и обработва безопасно числовите стойности"""
         namespace = "{http://schemas.datacontract.org/2004/07/Bizzio.Srv.Extensions.RiznShop}"
         products = []
         count = 0
 
         for article in self.root.findall(f".//{namespace}AI"):
-            product_data = {
-                "barcode": article.find(f"{namespace}Barcode").text if article.find(f"{namespace}Barcode") is not None else None,
-                "name": article.find(f"{namespace}Name").text if article.find(f"{namespace}Name") is not None else None,
-                "price": float(article.find(f"{namespace}P_Sale").text) if article.find(f"{namespace}P_Sale") is not None else None,
-                "qty": int(article.find(f"{namespace}Qty").text) if article.find(f"{namespace}Qty") is not None else 0,
-                "props": [prop.text for prop in article.findall(f"{namespace}Props/*") if prop.text],  # Записва всички `b:string`
-                "files": [
-                    {
-                        "id": file.find(f"{namespace}ID").text if file.find(f"{namespace}ID") is not None else None,
-                        "name": file.find(f"{namespace}Name").text if file.find(f"{namespace}Name") is not None else None,
-                        "url": file.find(f"{namespace}Uri").text if file.find(f"{namespace}Uri") is not None else None,
-                    }
-                    for file in article.findall(f"{namespace}Files/{namespace}FI")
-                ],
-            }
-            products.append(product_data)
-            count += 1
+            try:
+                qty_value = self.safe_get_text(article.find(f"{namespace}Qty"))
+                qty = round(float(qty_value)) if qty_value.replace(".", "").isdigit() else 0  # Конвертираме правилно
 
-            if count % batch_size == 0:
-                yield products  # Връща текущия batch
-                products = []
+                product_data = {
+                    "barcode": self.safe_get_text(article.find(f"{namespace}Barcode")),
+                    "name": self.safe_get_text(article.find(f"{namespace}Name")),
+                    "price": float(self.safe_get_text(article.find(f"{namespace}P_Sale")) or 0),
+                    "qty": qty,  # Закръгляне на наличността до цяло число
+                    "props": [prop.text for prop in article.findall(f"{namespace}Props/*") if prop.text],
+                    "files": [
+                        {
+                            "id": self.safe_get_text(file.find(f"{namespace}ID")),
+                            "name": self.safe_get_text(file.find(f"{namespace}Name")),
+                            "url": self.safe_get_text(file.find(f"{namespace}Uri")),
+                        }
+                        for file in article.findall(f"{namespace}Files/{namespace}FI")
+                    ],
+                }
+
+                products.append(product_data)
+                count += 1
+
+                if count % batch_size == 0:
+                    yield products  # Връща текущия batch
+                    products = []
+
+            except Exception as e:
+                print(f"⚠️ Грешка при обработка на продукт: {e}. Пропускане на този запис...")
 
         if products:
             yield products  # Връща оставащите продукти

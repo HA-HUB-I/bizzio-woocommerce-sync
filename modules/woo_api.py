@@ -20,24 +20,31 @@ class WooCommerceAPI:
         }
 
         response = requests.post(url, json=payload, auth=self.auth)
+
         if response.status_code in [200, 201]:
-            print(f"🟢 Успешна batch обработка: {response.status_code}")
-            return response.json()
+            result = response.json()
+            print(f"✅ Създадени: {len(result.get('create', []))}, Обновени: {len(result.get('update', []))}, Изтрити: {len(result.get('delete', []))}")
+            return result
         else:
             print(f"🔴 Грешка при batch заявка: {response.status_code}")
             print(response.text)
             return None
-    def get_product_by_sku(self, sku):
-        """Търси продукт по SKU в WooCommerce"""
-        url = f"{self.base_url}?sku={sku}"
-        response = requests.get(url, auth=self.auth)
 
+        
+    def get_products_by_skus(self, sku_list):
+        """Търси множество продукти по SKU в WooCommerce"""
+        sku_query = ",".join(sku_list)  # Комбинираме SKU в една заявка
+        url = f"{self.base_url}?sku={sku_query}&per_page=100"
+        
+        response = requests.get(url, auth=self.auth)
+        
         if response.status_code == 200:
             products = response.json()
-            return products[0] if products else None
+            return {p["sku"]: p for p in products}  # Връща речник {SKU: product_data}
         else:
-            print(f"🔴 Грешка при търсене на SKU {sku}: {response.status_code}")
-            return None
+            print(f"🔴 Грешка при търсене на SKU: {response.status_code}")
+            return {}
+
         
 
     def create_product(self, product):

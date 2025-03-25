@@ -1,0 +1,9 @@
+bizzio_*.xml
+*.xml
+bizzio_response.xml
+bizzio_request.xml
+config/__pycache__/settings.cpython-313.pyc
+modules/__pycache__/bizzio_api.cpython-313.pyc
+modules/__pycache__/product_sync.cpython-313.pyc
+modules/__pycache__/woo_api.cpython-313.pyc
+modules/__pycache__/xml_parser.cpython-313.pyc

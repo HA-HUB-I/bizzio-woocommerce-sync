@@ -2,7 +2,7 @@ BIZZIO_API = {
     "BASE_URL": "https://bizzio.gencloud.bg/Services/Extensions/RiznShopExtService.svc",
     "DATABASE": "mobel",
     "USERNAME": "InCloud",
-    "PASSWORD": "9LETKJ7K93",
+    "PASSWORD": "passs",
     "SITE_ID": "307371018165420033"
 }
 
